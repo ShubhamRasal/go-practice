@@ -1,34 +1,37 @@
 package models
 
+import (
+	"fmt"
+	"net/http"
+)
 
-// Service 
+// Service
 type Service struct {
-  Name string
-  Port int
-  Healthy bool
-  desc string
+	Timestamp   string
+	Name        string
+	URL         string
+	Healthy     bool
+	Description string
 }
 
 // NewService is constructor for service.
-func NewService(name string, port int) Service {
+func NewService(name string, url string) Service {
 
-   // validport
+	service := Service{Name: name, URL: url}
 
-   isHealthy := ValidatePort(port)
-
-  service :=  Service{Name: name,Port: port, Healthy: isHealthy}
-
-  return service
+	return service
 }
 
+func (s Service) CheckHealth() bool {
 
-func ValidatePort(port int) bool {
+	// implement the logic to check http get requst and return if 200 healthy or not
 
-	if port <= 0 || port >= 65535 {
+	resp, err := http.Get(s.URL)
+	if err != nil {
 		return false
-
-	} else {
-	    return true
-
 	}
+	defer resp.Body.Close()
+	fmt.Println("resp.StatusCode: ", resp.StatusCode)
+	// return resp.StatusCode == 200
+	return resp.StatusCode == 200
 }
